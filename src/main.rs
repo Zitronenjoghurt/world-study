@@ -20,7 +20,6 @@ pub fn get_data() -> Arc<WorldStudyData> {
 }
 
 fn main() {
-    let data = &get_data().countries;
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(
         "World Study",

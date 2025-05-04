@@ -2,7 +2,6 @@ use crate::country::{parse_countries, Country};
 use crate::generic::data_map::DataMap;
 use serde::{Deserialize, Serialize};
 
-pub mod basic;
 pub mod country;
 mod generic;
 mod traits;
