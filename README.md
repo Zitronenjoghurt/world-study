@@ -4,4 +4,5 @@ Interactively study world geography or something.
 
 # Sources
 
-- World Map SVG: https://github.com/raphaellepuschitz/SVG-World-Map/blob/master/src/world-states.svg
+- Country data: https://github.com/raphaellepuschitz/SVG-World-Map/blob/master/src/country-data.json
+- World Map SVG: https://mapsvg.com/maps/world

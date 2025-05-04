@@ -1,3 +1,4 @@
+use crate::ui::views::country_study::CountryStudyState;
 use crate::ui::views::main_menu::MainMenuState;
 use crate::ui::views::*;
 use eframe::{App, Frame};
@@ -14,6 +15,7 @@ pub struct WorldStudyApp {
 
     // View states
     main_menu_state: MainMenuState,
+    country_study_state: CountryStudyState,
 }
 
 impl WorldStudyApp {
@@ -30,6 +32,7 @@ impl App for WorldStudyApp {
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
         match self.current_view {
             UIView::MainMenu => main_menu::render(ctx, self),
+            UIView::CountryStudy => country_study::render(ctx, self),
         }
     }
 }
