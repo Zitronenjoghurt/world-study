@@ -1,2 +1,2 @@
 pub mod custom_button;
-mod world_map;
+pub mod world_map;

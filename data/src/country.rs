@@ -89,8 +89,11 @@ fn parse_svg_path(path_data: &str) -> Vec<Vec<(f32, f32)>> {
     let data = Data::parse(path_data).unwrap();
     let mut lines = Vec::new();
 
+    let mut origin = (0.0, 0.0);
     let mut current_pos = (0.0, 0.0);
     let mut current_line = Vec::new();
+
+    let mut has_origin = false;
     let mut is_new_line = true;
 
     for command in data.iter() {
@@ -100,17 +103,29 @@ fn parse_svg_path(path_data: &str) -> Vec<Vec<(f32, f32)>> {
                     let (x, y) = (pair[0], pair[1]);
 
                     if is_new_line {
-                        current_pos = (x, y);
+                        current_pos = if has_origin {
+                            origin.0 += x;
+                            origin.1 += y;
+                            origin
+                        } else {
+                            (x, y)
+                        };
                         is_new_line = false;
                     } else {
                         current_pos.0 += x;
                         current_pos.1 += y;
                     }
 
+                    if !has_origin {
+                        origin = (x, y);
+                        has_origin = true;
+                    }
+
                     current_line.push(current_pos);
                 }
             }
             Command::Close => {
+                current_line.push(origin);
                 lines.push(current_line.clone());
                 current_line.clear();
                 is_new_line = true;

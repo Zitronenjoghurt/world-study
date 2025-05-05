@@ -11,8 +11,11 @@ mod traits;
 #[derive(Debug, Serialize, Deserialize)]
 pub struct WorldStudyData {
     countries: DataMap<Country>,
+    #[serde(skip, default)]
     countries_by_region: HashMap<String, HashSet<String>>,
+    #[serde(skip, default)]
     country_codes: HashSet<String>,
+    #[serde(skip, default)]
     regions: HashSet<String>,
 }
 
