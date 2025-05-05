@@ -7,10 +7,8 @@ edition = "2024"
 bincode = "1.3.3"
 eframe = "0.31.1"
 egui = "0.31.1"
-egui_extras = { version = "0.31.1", features = ["svg"] }
 flate2 = "1.1.1"
 once_cell = "1.21.3"
-serde = { version = "1.0.219", features = ["derive"] }
 world-study-data = { path = "data" }
 
 [build-dependencies]

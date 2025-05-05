@@ -1,7 +1,5 @@
 use crate::get_data;
-use egui::{Color32, Pos2, Rect, Stroke, Ui, Vec2};
-use std::sync::Arc;
-use world_study_data::country::Country;
+use egui::{Pos2, Rect, Ui, Vec2};
 
 #[derive(Debug)]
 pub struct WorldMapState {
@@ -27,20 +25,23 @@ impl WorldMapState {
             .max_inner_size(Vec2::new(200.0, 200.0));
 
         scene.show(ui, &mut self.scene_rect, |ui| {
-            for country in get_data().countries_iter() {
-                draw_country(ui, country);
+            for country_code in get_data().get_country_codes() {
+                draw_country(ui, country_code);
             }
         });
     }
 }
 
-fn draw_country(ui: &mut Ui, country: &Arc<Country>) {
-    for line in &country.outlines {
-        let mut points = Vec::new();
-        for (x, y) in line {
-            points.push(Pos2::new(*x, *y));
+fn draw_country(ui: &mut Ui, country_code: &str) {
+    if let Some(outlines) = get_data().get_country_outlines(country_code) {
+        for outline in outlines {
+            ui.painter().add(outline.clone());
         }
-        ui.painter()
-            .line(points, Stroke::new(0.2, Color32::from_rgb(255, 255, 255)));
+    }
+
+    if let Some(meshes) = get_data().get_country_meshes(country_code) {
+        for mesh in meshes {
+            ui.painter().add(mesh.clone());
+        }
     }
 }
