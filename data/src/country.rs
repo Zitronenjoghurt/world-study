@@ -38,25 +38,28 @@ struct JsonCountry {
 pub fn parse_countries() -> DataMap<Country> {
     parse_svg_file();
 
-    let mut map = DataMap::new();
+    let mut countries = DataMap::new();
 
     let file_path = PathBuf::from("data/files/countries.json");
     let file = std::fs::File::open(file_path).unwrap();
-    let countries: HashMap<String, JsonCountry> = serde_json::from_reader(file).unwrap();
+    let parsed_data: HashMap<String, JsonCountry> = serde_json::from_reader(file).unwrap();
     let outlines: HashMap<String, Vec<Vec<(f32, f32)>>> = parse_svg_file();
 
-    for (code, data) in countries {
+    for (code, data) in parsed_data {
+        let code = code.to_uppercase();
+
         let country = Country {
-            code: code.clone(),
+            outlines: outlines.get(&code).cloned().unwrap_or_default(),
+            code,
             name: data.name,
             long_name: data.longname,
             region: data.region,
-            outlines: outlines.get(&code).cloned().unwrap_or_default(),
         };
-        map.add(country);
+
+        countries.add(country);
     }
 
-    map
+    countries
 }
 
 fn parse_svg_file() -> HashMap<String, Vec<Vec<(f32, f32)>>> {
@@ -76,7 +79,7 @@ fn parse_svg_file() -> HashMap<String, Vec<Vec<(f32, f32)>>> {
         };
 
         let lines = parse_svg_path(path_data);
-        country_outlines.insert(id.to_string(), lines);
+        country_outlines.insert(id.to_uppercase(), lines);
     }
 
     country_outlines

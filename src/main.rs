@@ -12,7 +12,10 @@ static DATA: Lazy<Arc<WorldStudyData>> = Lazy::new(|| {
     let mut decompressor = ZlibDecoder::new(INCLUDED_DATA);
     let mut decompressed_data = Vec::new();
     decompressor.read_to_end(&mut decompressed_data).unwrap();
-    Arc::new(bincode::deserialize(&decompressed_data).unwrap())
+
+    let mut data: WorldStudyData = bincode::deserialize(&decompressed_data).unwrap();
+    data.initialize();
+    Arc::new(data)
 });
 
 pub fn get_data() -> Arc<WorldStudyData> {

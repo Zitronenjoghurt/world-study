@@ -1,9 +1,10 @@
 use crate::traits::has_id::HasId;
 use serde::{Deserialize, Serialize};
+use std::collections::hash_map::Keys;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-#[derive(Debug, Default, PartialEq)]
+#[derive(Debug, Default, Clone, PartialEq)]
 pub struct DataMap<T>
 where
     T: HasId + Serialize + for<'de> Deserialize<'de>,
@@ -23,13 +24,25 @@ where
         }
     }
 
+    pub fn keys(&self) -> Keys<T::Id, Arc<T>> {
+        self.entities.keys()
+    }
+
     pub fn add(&mut self, entity: T) {
         let id = entity.id();
         self.entities.insert(id, Arc::new(entity));
     }
 
-    pub fn get(&self, id: T::Id) -> Option<Arc<T>> {
-        self.entities.get(&id).cloned()
+    pub fn get<Q>(&self, id: &Q) -> Option<&Arc<T>>
+    where
+        T::Id: std::borrow::Borrow<Q>,
+        Q: std::hash::Hash + Eq + ?Sized,
+    {
+        self.entities.get(id)
+    }
+
+    pub fn iter(&self) -> impl Iterator<Item = &Arc<T>> {
+        self.entities.values()
     }
 }
 
