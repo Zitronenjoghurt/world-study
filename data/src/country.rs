@@ -7,6 +7,8 @@ use svg::node::element::path::{Command, Data};
 use svg::node::element::tag::Type;
 use svg::parser::Event;
 
+pub mod meshes;
+
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Country {
     pub code: String,

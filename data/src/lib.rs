@@ -1,6 +1,10 @@
+use crate::country::meshes::{CountryMeshes, CountryMeshesMap};
 use crate::country::{parse_countries, Country};
 use crate::generic::data_map::DataMap;
+use crate::generic::identified_polygon::IdentifiedPolygon;
 use egui::{Color32, Pos2, Shape, Stroke};
+use geo::{Coord, LineString, Polygon};
+use rstar::{PointDistance, RTree, AABB};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
@@ -21,7 +25,9 @@ pub struct WorldStudyData {
     #[serde(skip, default)]
     country_outlines: HashMap<String, Vec<Shape>>,
     #[serde(skip, default)]
-    country_meshes: HashMap<String, Vec<Shape>>,
+    country_meshes: CountryMeshesMap,
+    #[serde(skip, default)]
+    country_polygon_tree: RTree<IdentifiedPolygon>,
 }
 
 impl WorldStudyData {
@@ -33,7 +39,8 @@ impl WorldStudyData {
             regions: HashSet::new(),
             country_codes: HashSet::new(),
             country_outlines: HashMap::new(),
-            country_meshes: HashMap::new(),
+            country_meshes: CountryMeshesMap::default(),
+            country_polygon_tree: RTree::new(),
         }
     }
 
@@ -51,7 +58,8 @@ impl WorldStudyData {
         self.country_codes = self.countries.keys().cloned().collect();
 
         self.country_outlines = initialize_country_outlines(&self.countries);
-        self.country_meshes = initialize_country_meshes(&self.countries);
+        self.country_meshes = CountryMeshesMap::build(&self.countries);
+        self.country_polygon_tree = initialize_country_polygon_tree(&self.countries);
     }
 
     pub fn get_country(&self, country_code: &str) -> Option<&Arc<Country>> {
@@ -77,7 +85,7 @@ impl WorldStudyData {
         self.country_outlines.get(country_code)
     }
 
-    pub fn get_country_meshes(&self, country_code: &str) -> Option<&Vec<Shape>> {
+    pub fn get_country_meshes(&self, country_code: &str) -> Option<&CountryMeshes> {
         self.country_meshes.get(country_code)
     }
 
@@ -92,10 +100,20 @@ impl WorldStudyData {
     pub fn region_exists(&self, region: &str) -> bool {
         self.regions.contains(&region.to_uppercase())
     }
+
+    pub fn get_country_code_at_point(&self, x: f32, y: f32) -> Option<String> {
+        let point_envelope = AABB::from_point([x as f64, y as f64]);
+        self.country_polygon_tree
+            .locate_in_envelope_intersecting(&point_envelope)
+            .filter(|poly| poly.contains_point(&[x as f64, y as f64]))
+            .map(|poly| poly.id().to_owned())
+            .next()
+    }
 }
 
 fn initialize_country_outlines(countries: &DataMap<Country>) -> HashMap<String, Vec<Shape>> {
     let mut country_outlines = HashMap::new();
+
     for country in countries.iter() {
         let mut shapes = Vec::new();
         for line in &country.outlines {
@@ -109,54 +127,29 @@ fn initialize_country_outlines(countries: &DataMap<Country>) -> HashMap<String, 
             );
             shapes.push(shape);
         }
+
         country_outlines.insert(country.code.clone(), shapes);
     }
+
     country_outlines
 }
 
-fn initialize_country_meshes(countries: &DataMap<Country>) -> HashMap<String, Vec<Shape>> {
-    let mut country_meshes = HashMap::new();
+fn initialize_country_polygon_tree(countries: &DataMap<Country>) -> RTree<IdentifiedPolygon> {
+    let mut polygons = Vec::new();
+
     for country in countries.iter() {
-        let mut meshes = Vec::new();
-
-        for line in &country.outlines {
-            let mut outline_points = Vec::new();
-            let mut flat_points = Vec::new();
-            for (x, y) in line {
-                outline_points.push(Pos2::new(*x, *y));
-                flat_points.push(*x as f64);
-                flat_points.push(*y as f64);
+        for outline in &country.outlines {
+            let mut points = Vec::new();
+            for (x, y) in outline {
+                points.push(Coord::from((*x as f64, *y as f64)));
             }
 
-            let mut mesh = egui::Mesh::default();
-            mesh.vertices.reserve(outline_points.len());
-
-            if let Ok(indices) = earcutr::earcut(&flat_points, &[], 2) {
-                let mut mesh = egui::Mesh::default();
-                mesh.vertices.reserve(outline_points.len());
-
-                for point in &outline_points {
-                    mesh.vertices.push(egui::epaint::Vertex {
-                        pos: *point,
-                        uv: Pos2::ZERO,
-                        color: Color32::from_rgba_premultiplied(60, 60, 180, 40),
-                    });
-                }
-
-                for chunk in indices.chunks(3) {
-                    if chunk.len() == 3 {
-                        mesh.indices.push(chunk[0] as u32);
-                        mesh.indices.push(chunk[1] as u32);
-                        mesh.indices.push(chunk[2] as u32);
-                    }
-                }
-
-                meshes.push(Shape::Mesh(Arc::from(mesh)));
-            }
+            let exterior = LineString(points);
+            let polygon = Polygon::new(exterior, vec![]);
+            let id_polygon = IdentifiedPolygon::new(country.code.clone(), polygon);
+            polygons.push(id_polygon);
         }
-
-        country_meshes.insert(country.code.clone(), meshes);
     }
 
-    country_meshes
+    RTree::bulk_load(polygons)
 }
