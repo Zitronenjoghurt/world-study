@@ -21,6 +21,9 @@ pub fn render(ctx: &Context, app: &mut WorldStudyApp) {
 }
 
 fn menu_buttons(ui: &mut Ui, app: &mut WorldStudyApp) {
+    if menu_button(ui, "Explore").clicked() {
+        app.switch_view(UIView::Explore);
+    }
     if menu_button(ui, "Study").clicked() {
         app.switch_view(UIView::CountryStudy);
     }

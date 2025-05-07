@@ -11,6 +11,7 @@ pub struct WorldMapState {
     scene_rect: Rect,
     pub hovered_country: Option<String>,
     pub selected_country: Option<String>,
+    pub mouse_position: Option<Pos2>,
 }
 
 impl Default for WorldMapState {
@@ -19,6 +20,7 @@ impl Default for WorldMapState {
             scene_rect: Rect::from_min_size(Pos2::ZERO, Vec2::new(WIDTH, HEIGHT)),
             hovered_country: None,
             selected_country: None,
+            mouse_position: None,
         }
     }
 }
@@ -38,12 +40,18 @@ impl WorldMapState {
                 if let Some(mouse_pos) = hover_rect_response.hover_pos() {
                     self.hovered_country =
                         get_data().get_country_code_at_point(mouse_pos.x, mouse_pos.y);
+                    self.mouse_position = Some(mouse_pos);
                 }
             }
 
             if hover_rect_response.clicked() {
-                if let Some(country_code) = &self.hovered_country {
-                    self.selected_country = Some(country_code.to_owned());
+                if let Some(hovered_country) = &self.hovered_country {
+                    self.selected_country =
+                        if self.selected_country.as_ref() == Some(hovered_country) {
+                            None
+                        } else {
+                            Some(hovered_country.to_owned())
+                        };
                 } else {
                     self.selected_country = None;
                 }

@@ -2,7 +2,7 @@ use crate::country::meshes::{CountryMeshes, CountryMeshesMap};
 use crate::country::{parse_countries, Country};
 use crate::generic::data_map::DataMap;
 use crate::generic::identified_polygon::IdentifiedPolygon;
-use egui::{Color32, Image, Pos2, Shape, Stroke};
+use egui::{Color32, Image, Pos2, Shape, Stroke, Vec2};
 use geo::{Coord, LineString, Polygon};
 use rstar::{PointDistance, RTree, AABB};
 use serde::{Deserialize, Serialize};
@@ -116,13 +116,13 @@ impl WorldStudyData {
             .map(|poly| poly.id().to_owned())
     }
 
-    pub fn get_country_flag_image(&self, country_code: &str) -> Option<Image> {
+    pub fn get_country_flag_image(&self, country_code: &str, size: Vec2) -> Option<Image> {
         self.get_country(country_code).map(|country| {
             Image::from_bytes(
                 format!("bytes://flag_{}.svg", country.code),
                 country.flag_svg.clone(),
             )
-            .maintain_aspect_ratio(true)
+            .fit_to_exact_size(size)
         })
     }
 }
