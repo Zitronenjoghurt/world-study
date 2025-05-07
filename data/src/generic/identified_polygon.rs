@@ -4,16 +4,25 @@ use rstar::{PointDistance, RTreeObject, AABB};
 #[derive(Debug)]
 pub struct IdentifiedPolygon {
     id: String,
+    priority: bool,
     polygon: Polygon<f64>,
 }
 
 impl IdentifiedPolygon {
-    pub fn new(id: String, polygon: Polygon<f64>) -> Self {
-        Self { id, polygon }
+    pub fn new(id: String, polygon: Polygon<f64>, priority: bool) -> Self {
+        Self {
+            id,
+            priority,
+            polygon,
+        }
     }
 
     pub fn id(&self) -> &str {
         &self.id
+    }
+
+    pub fn priority(&self) -> bool {
+        self.priority
     }
 }
 

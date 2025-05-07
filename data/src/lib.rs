@@ -19,7 +19,7 @@ pub struct WorldStudyData {
     #[serde(skip, default)]
     countries_by_region: HashMap<String, HashSet<String>>,
     #[serde(skip, default)]
-    country_codes: HashSet<String>,
+    country_codes: Vec<String>,
     #[serde(skip, default)]
     regions: HashSet<String>,
     #[serde(skip, default)]
@@ -37,7 +37,7 @@ impl WorldStudyData {
             countries,
             countries_by_region: HashMap::new(),
             regions: HashSet::new(),
-            country_codes: HashSet::new(),
+            country_codes: Vec::new(),
             country_outlines: HashMap::new(),
             country_meshes: CountryMeshesMap::default(),
             country_polygon_tree: RTree::new(),
@@ -54,9 +54,15 @@ impl WorldStudyData {
         }
         self.countries_by_region = countries_by_region;
 
-        self.regions = self.countries_by_region.keys().cloned().collect();
-        self.country_codes = self.countries.keys().cloned().collect();
+        // This will ensure that enclaves are always at the end of the list
+        let mut country_vec: Vec<_> = self.countries.iter().collect();
+        country_vec.sort_by_key(|country| country.is_enclave);
+        self.country_codes = country_vec
+            .into_iter()
+            .map(|country| country.code.clone())
+            .collect();
 
+        self.regions = self.countries_by_region.keys().cloned().collect();
         self.country_outlines = initialize_country_outlines(&self.countries);
         self.country_meshes = CountryMeshesMap::build(&self.countries);
         self.country_polygon_tree = initialize_country_polygon_tree(&self.countries);
@@ -77,7 +83,7 @@ impl WorldStudyData {
         self.countries.iter()
     }
 
-    pub fn get_country_codes(&self) -> &HashSet<String> {
+    pub fn get_country_codes(&self) -> &Vec<String> {
         &self.country_codes
     }
 
@@ -106,8 +112,8 @@ impl WorldStudyData {
         self.country_polygon_tree
             .locate_in_envelope_intersecting(&point_envelope)
             .filter(|poly| poly.contains_point(&[x as f64, y as f64]))
+            .max_by_key(|poly| poly.priority())
             .map(|poly| poly.id().to_owned())
-            .next()
     }
 }
 
@@ -123,7 +129,7 @@ fn initialize_country_outlines(countries: &DataMap<Country>) -> HashMap<String, 
             }
             let shape = Shape::line(
                 outline_points,
-                Stroke::new(0.2, Color32::from_rgb(255, 255, 255)),
+                Stroke::new(0.1, Color32::from_rgb(255, 255, 255)),
             );
             shapes.push(shape);
         }
@@ -146,7 +152,8 @@ fn initialize_country_polygon_tree(countries: &DataMap<Country>) -> RTree<Identi
 
             let exterior = LineString(points);
             let polygon = Polygon::new(exterior, vec![]);
-            let id_polygon = IdentifiedPolygon::new(country.code.clone(), polygon);
+            let id_polygon =
+                IdentifiedPolygon::new(country.code.clone(), polygon, country.is_enclave);
             polygons.push(id_polygon);
         }
     }

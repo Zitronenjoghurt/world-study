@@ -9,6 +9,10 @@ use svg::parser::Event;
 
 pub mod meshes;
 
+const COUNTRIES_PATH: &str = "data/files/countries.json";
+const FLAGS_PATH: &str = "data/files/flags";
+const WORLD_SVG_PATH: &str = "data/files/world.svg";
+
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct Country {
     pub code: String,
@@ -16,6 +20,8 @@ pub struct Country {
     pub long_name: String,
     pub region: String,
     pub outlines: Vec<Vec<(f32, f32)>>,
+    pub is_enclave: bool,
+    pub flag_svg: String,
 }
 
 impl HasId for Country {
@@ -35,20 +41,21 @@ struct JsonCountry {
     pub name: String,
     pub longname: String,
     pub region: String,
+    #[serde(default)]
+    pub is_enclave: bool,
 }
 
 pub fn parse_countries() -> DataMap<Country> {
-    parse_svg_file();
-
     let mut countries = DataMap::new();
 
-    let file_path = PathBuf::from("data/files/countries.json");
+    let file_path = PathBuf::from(COUNTRIES_PATH);
     let file = std::fs::File::open(file_path).unwrap();
     let parsed_data: HashMap<String, JsonCountry> = serde_json::from_reader(file).unwrap();
     let outlines: HashMap<String, Vec<Vec<(f32, f32)>>> = parse_svg_file();
 
     for (code, data) in parsed_data {
         let code = code.to_uppercase();
+        let flag_svg = get_country_flag(&code);
 
         let country = Country {
             outlines: outlines.get(&code).cloned().unwrap_or_default(),
@@ -56,6 +63,8 @@ pub fn parse_countries() -> DataMap<Country> {
             name: data.name,
             long_name: data.longname,
             region: data.region,
+            is_enclave: data.is_enclave,
+            flag_svg,
         };
 
         countries.add(country);
@@ -65,7 +74,7 @@ pub fn parse_countries() -> DataMap<Country> {
 }
 
 fn parse_svg_file() -> HashMap<String, Vec<Vec<(f32, f32)>>> {
-    let file_path = PathBuf::from("data/files/world.svg");
+    let file_path = PathBuf::from(WORLD_SVG_PATH);
     let content = std::fs::read_to_string(file_path).unwrap();
 
     let mut country_outlines = HashMap::new();
@@ -137,4 +146,10 @@ fn parse_svg_path(path_data: &str) -> Vec<Vec<(f32, f32)>> {
     }
 
     lines
+}
+
+fn get_country_flag(code: &str) -> String {
+    let path = PathBuf::from(FLAGS_PATH).join(format!("{}.svg", code.to_uppercase()));
+    std::fs::read_to_string(path)
+        .expect(format!("Did not find flag svg for country: {}", code).as_str())
 }

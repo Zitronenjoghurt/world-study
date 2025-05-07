@@ -1203,7 +1203,8 @@
     "longname": "The Kingdom of Lesotho",
     "sovereignty": "UN",
     "region": "AF",
-    "population": 2007201
+    "population": 2007201,
+    "is_enclave": true
   },
   "LT": {
     "name": "Lithuania",
@@ -1708,7 +1709,8 @@
     "longname": "The Republic of San Marino",
     "sovereignty": "UN",
     "region": "EU",
-    "population": 33344
+    "population": 33344,
+    "is_enclave": true
   },
   "SN": {
     "name": "Senegal",
@@ -1774,7 +1776,8 @@
     "altnames": "Swaziland",
     "sovereignty": "UN",
     "region": "AF",
-    "population": 1093238
+    "population": 1093238,
+    "is_enclave": true
   },
   "TC": {
     "name": "Turks and Caicos Islands",
@@ -1935,7 +1938,8 @@
     "longname": "The Holy See",
     "sovereignty": "UN observer",
     "region": "EU",
-    "population": 1000
+    "population": 1000,
+    "is_enclave": true
   },
   "VC": {
     "name": "Saint Vincent and the Grenadines",

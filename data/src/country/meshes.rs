@@ -66,10 +66,10 @@ fn initialize_country_meshes(countries: &DataMap<Country>) -> HashMap<String, Co
                 };
 
                 default_meshes.push(create_mesh(Color32::from_rgba_premultiplied(
-                    60, 60, 180, 40,
+                    84, 78, 207, 255,
                 )));
                 hovered_meshes.push(create_mesh(Color32::from_rgba_premultiplied(
-                    100, 100, 220, 60,
+                    94, 88, 239, 255,
                 )));
             }
         }

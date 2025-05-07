@@ -19,7 +19,7 @@ impl Default for WorldMapState {
 impl WorldMapState {
     pub fn draw(&mut self, ui: &mut Ui) {
         let scene = egui::Scene::new()
-            .zoom_range(0.1..=20.0)
+            .zoom_range(0.2..=1000.0)
             .max_inner_size(Vec2::new(200.0, 200.0));
 
         scene.show(ui, &mut self.scene_rect, |ui| {

@@ -6,3 +6,4 @@ Interactively study world geography or something.
 
 - Country data: https://github.com/raphaellepuschitz/SVG-World-Map/blob/master/src/country-data.json
 - World Map SVG: https://mapsvg.com/maps/world
+- Country flags: https://github.com/hampusborgos/country-flags
