@@ -27,7 +27,10 @@ fn main() {
     eframe::run_native(
         "World Study",
         native_options,
-        Box::new(|cc| Ok(Box::new(WorldStudyApp::new(cc)))),
+        Box::new(|cc| {
+            egui_extras::install_image_loaders(&cc.egui_ctx);
+            Ok(Box::new(WorldStudyApp::new(cc)))
+        }),
     )
     .expect("Failed to run egui application.");
 }

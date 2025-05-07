@@ -23,6 +23,7 @@ impl CountryMeshesMap {
 pub struct CountryMeshes {
     pub default: Vec<Shape>,
     pub hovered: Vec<Shape>,
+    pub selected: Vec<Shape>,
 }
 
 fn initialize_country_meshes(countries: &DataMap<Country>) -> HashMap<String, CountryMeshes> {
@@ -31,6 +32,7 @@ fn initialize_country_meshes(countries: &DataMap<Country>) -> HashMap<String, Co
     for country in countries.iter() {
         let mut default_meshes = Vec::new();
         let mut hovered_meshes = Vec::new();
+        let mut selected_meshes = Vec::new();
 
         for line in &country.outlines {
             let mut outline_points = Vec::new();
@@ -65,12 +67,9 @@ fn initialize_country_meshes(countries: &DataMap<Country>) -> HashMap<String, Co
                     Shape::Mesh(Arc::from(mesh))
                 };
 
-                default_meshes.push(create_mesh(Color32::from_rgba_premultiplied(
-                    84, 78, 207, 255,
-                )));
-                hovered_meshes.push(create_mesh(Color32::from_rgba_premultiplied(
-                    94, 88, 239, 255,
-                )));
+                default_meshes.push(create_mesh(Color32::from_rgb(222, 163, 139)));
+                hovered_meshes.push(create_mesh(Color32::from_rgb(249, 130, 132)));
+                selected_meshes.push(create_mesh(Color32::from_rgb(255, 196, 132)));
             }
         }
 
@@ -79,6 +78,7 @@ fn initialize_country_meshes(countries: &DataMap<Country>) -> HashMap<String, Co
             CountryMeshes {
                 default: default_meshes,
                 hovered: hovered_meshes,
+                selected: selected_meshes,
             },
         );
     }

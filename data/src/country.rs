@@ -21,7 +21,7 @@ pub struct Country {
     pub region: String,
     pub outlines: Vec<Vec<(f32, f32)>>,
     pub is_enclave: bool,
-    pub flag_svg: String,
+    pub flag_svg: Vec<u8>,
 }
 
 impl HasId for Country {
@@ -148,8 +148,7 @@ fn parse_svg_path(path_data: &str) -> Vec<Vec<(f32, f32)>> {
     lines
 }
 
-fn get_country_flag(code: &str) -> String {
+fn get_country_flag(code: &str) -> Vec<u8> {
     let path = PathBuf::from(FLAGS_PATH).join(format!("{}.svg", code.to_uppercase()));
-    std::fs::read_to_string(path)
-        .expect(format!("Did not find flag svg for country: {}", code).as_str())
+    std::fs::read(path).unwrap_or_else(|_| panic!("Did not find flag svg for country: {}", code))
 }

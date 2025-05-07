@@ -2,7 +2,7 @@ use crate::country::meshes::{CountryMeshes, CountryMeshesMap};
 use crate::country::{parse_countries, Country};
 use crate::generic::data_map::DataMap;
 use crate::generic::identified_polygon::IdentifiedPolygon;
-use egui::{Color32, Pos2, Shape, Stroke};
+use egui::{Color32, Image, Pos2, Shape, Stroke};
 use geo::{Coord, LineString, Polygon};
 use rstar::{PointDistance, RTree, AABB};
 use serde::{Deserialize, Serialize};
@@ -115,6 +115,16 @@ impl WorldStudyData {
             .max_by_key(|poly| poly.priority())
             .map(|poly| poly.id().to_owned())
     }
+
+    pub fn get_country_flag_image(&self, country_code: &str) -> Option<Image> {
+        self.get_country(country_code).map(|country| {
+            Image::from_bytes(
+                format!("bytes://flag_{}.svg", country.code),
+                country.flag_svg.clone(),
+            )
+            .maintain_aspect_ratio(true)
+        })
+    }
 }
 
 fn initialize_country_outlines(countries: &DataMap<Country>) -> HashMap<String, Vec<Shape>> {
@@ -127,10 +137,12 @@ fn initialize_country_outlines(countries: &DataMap<Country>) -> HashMap<String, 
             for (x, y) in line {
                 outline_points.push(Pos2::new(*x, *y));
             }
+
             let shape = Shape::line(
                 outline_points,
-                Stroke::new(0.1, Color32::from_rgb(255, 255, 255)),
+                Stroke::new(0.1, Color32::from_rgb(108, 86, 113)),
             );
+
             shapes.push(shape);
         }
 
@@ -159,4 +171,18 @@ fn initialize_country_polygon_tree(countries: &DataMap<Country>) -> RTree<Identi
     }
 
     RTree::bulk_load(polygons)
+}
+
+fn initialize_country_flag_images(countries: &DataMap<Country>) -> HashMap<String, Image> {
+    let mut flag_images = HashMap::new();
+
+    for country in countries.iter() {
+        let image = Image::from_bytes(
+            format!("bytes://flag_{}.svg", country.code),
+            country.flag_svg.clone(),
+        );
+        flag_images.insert(country.code.clone(), image);
+    }
+
+    flag_images
 }

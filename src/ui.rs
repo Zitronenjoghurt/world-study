@@ -30,9 +30,15 @@ impl WorldStudyApp {
 
 impl App for WorldStudyApp {
     fn update(&mut self, ctx: &Context, _frame: &mut Frame) {
+        #[cfg(feature = "profiling")]
+        profiling::scope!("frame");
+
         match self.current_view {
             UIView::MainMenu => main_menu::render(ctx, self),
             UIView::CountryStudy => country_study::render(ctx, self),
         }
+
+        #[cfg(feature = "profiling")]
+        profiling::finish_frame!();
     }
 }
