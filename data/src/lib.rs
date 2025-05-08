@@ -119,7 +119,7 @@ impl WorldStudyData {
     pub fn get_country_flag_image(&self, country_code: &str, size: Vec2) -> Option<Image> {
         self.get_country(country_code).map(|country| {
             Image::from_bytes(
-                format!("bytes://flag_{}.svg", country.code),
+                format!("bytes://flag_{}_{}x{}.svg", country.code, size.x, size.y),
                 country.flag_svg.clone(),
             )
             .fit_to_exact_size(size)

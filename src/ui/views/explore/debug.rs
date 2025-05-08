@@ -1,8 +1,9 @@
 use crate::ui::WorldStudyApp;
-use egui::Context;
+use egui::{Context, Id};
 
 pub fn render_debug_window(ctx: &Context, app: &mut WorldStudyApp) {
     egui::Window::new("Debug")
+        .id(Id::new("explore_debug_window"))
         .open(&mut app.explore_state.debug_window_enabled)
         .show(ctx, |ui| {
             if let Some(mouse_pos) = app.explore_state.world_map.mouse_position {
