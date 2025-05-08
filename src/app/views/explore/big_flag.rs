@@ -1,5 +1,5 @@
+use crate::app::WorldStudyApp;
 use crate::get_data;
-use crate::ui::WorldStudyApp;
 use eframe::emath::Vec2;
 use egui::{Context, Id};
 

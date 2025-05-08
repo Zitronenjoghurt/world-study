@@ -1,7 +1,7 @@
-use crate::ui::components::custom_button::CustomButton;
-use crate::ui::styles::generic_size::GenericSize;
-use crate::ui::views::UIView;
-use crate::ui::WorldStudyApp;
+use crate::app::components::custom_button::CustomButton;
+use crate::app::styles::generic_size::GenericSize;
+use crate::app::views::UIView;
+use crate::app::WorldStudyApp;
 use egui::{Context, Response, RichText, Ui, Vec2};
 
 #[derive(Debug, Default)]
@@ -21,11 +21,11 @@ pub fn render(ctx: &Context, app: &mut WorldStudyApp) {
 }
 
 fn menu_buttons(ui: &mut Ui, app: &mut WorldStudyApp) {
+    if menu_button(ui, "Study").clicked() {
+        app.switch_view(UIView::StudyMenu);
+    }
     if menu_button(ui, "Explore").clicked() {
         app.switch_view(UIView::Explore);
-    }
-    if menu_button(ui, "Study").clicked() {
-        app.switch_view(UIView::CountryStudy);
     }
 }
 

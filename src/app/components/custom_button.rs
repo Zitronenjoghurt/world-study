@@ -1,6 +1,6 @@
-use crate::ui::styles::button_size::ButtonSize;
-use crate::ui::styles::generic_size::GenericSize;
-use crate::ui::styles::text_size::TextSize;
+use crate::app::styles::button_size::ButtonSize;
+use crate::app::styles::generic_size::GenericSize;
+use crate::app::styles::text_size::TextSize;
 use egui::{Button, Response, RichText, Ui};
 
 #[derive(Debug)]

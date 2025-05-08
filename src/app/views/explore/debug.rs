@@ -1,4 +1,4 @@
-use crate::ui::WorldStudyApp;
+use crate::app::WorldStudyApp;
 use egui::{Context, Id};
 
 pub fn render_debug_window(ctx: &Context, app: &mut WorldStudyApp) {

@@ -1,5 +1,7 @@
+use crate::app::persistence::persistent_object::PersistentObject;
 use crate::get_data;
 use egui::{Color32, Pos2, Rect, Ui, Vec2};
+use serde::{Deserialize, Serialize};
 
 const HEIGHT: f32 = 670.0;
 const WIDTH: f32 = 1010.0;
@@ -20,6 +22,43 @@ impl Default for WorldMapState {
             scene_rect: Rect::from_min_size(Pos2::ZERO, Vec2::new(WIDTH, HEIGHT)),
             hovered_country: None,
             selected_country: None,
+            mouse_position: None,
+        }
+    }
+}
+
+#[derive(Debug, Default, Serialize, Deserialize)]
+pub struct WorldMapStatePersist {
+    scene_rect_min_x: f32,
+    scene_rect_min_y: f32,
+    scene_rect_max_x: f32,
+    scene_rect_max_y: f32,
+    hovered_country: Option<String>,
+    selected_country: Option<String>,
+}
+
+impl PersistentObject for WorldMapState {
+    type PersistentState = WorldMapStatePersist;
+
+    fn save_state(&self) -> Self::PersistentState {
+        WorldMapStatePersist {
+            scene_rect_min_x: self.scene_rect.min.x,
+            scene_rect_min_y: self.scene_rect.min.y,
+            scene_rect_max_x: self.scene_rect.max.x,
+            scene_rect_max_y: self.scene_rect.max.y,
+            hovered_country: self.hovered_country.clone(),
+            selected_country: self.selected_country.clone(),
+        }
+    }
+
+    fn load_state(state: Self::PersistentState) -> Self {
+        let min = Pos2::new(state.scene_rect_min_x, state.scene_rect_min_y);
+        let max = Pos2::new(state.scene_rect_max_x, state.scene_rect_max_y);
+        let scene_rect = Rect::from_min_max(min, max);
+        Self {
+            scene_rect,
+            hovered_country: state.hovered_country,
+            selected_country: state.selected_country,
             mouse_position: None,
         }
     }

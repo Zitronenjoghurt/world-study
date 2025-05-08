@@ -1,4 +1,4 @@
-use crate::ui::styles::generic_size::GenericSize;
+use crate::app::styles::generic_size::GenericSize;
 
 #[derive(Debug, Copy, Clone)]
 pub enum TextSize {

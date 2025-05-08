@@ -1,11 +1,11 @@
-use crate::ui::WorldStudyApp;
+use crate::app::WorldStudyApp;
 use flate2::read::ZlibDecoder;
 use once_cell::sync::Lazy;
 use std::io::Read;
 use std::sync::Arc;
 use world_study_data::WorldStudyData;
 
-mod ui;
+mod app;
 
 const INCLUDED_DATA: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/data.bin"));
 static DATA: Lazy<Arc<WorldStudyData>> = Lazy::new(|| {

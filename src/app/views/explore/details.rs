@@ -1,9 +1,9 @@
+use crate::app::WorldStudyApp;
 use crate::get_data;
-use crate::ui::WorldStudyApp;
 use egui::{Context, CursorIcon, Sense, Vec2};
 
-const MAX_FLAG_WIDTH: f32 = 100.0;
-const MAX_FLAG_HEIGHT: f32 = 100.0;
+const MAX_FLAG_WIDTH: f32 = 50.0;
+const MAX_FLAG_HEIGHT: f32 = 50.0;
 
 pub fn render_details_window(ctx: &Context, app: &mut WorldStudyApp) {
     if let Some(selected_country) = &app.explore_state.world_map.selected_country {

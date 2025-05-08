@@ -1,14 +1,14 @@
-use crate::ui::components::world_map::WorldMapState;
-use crate::ui::WorldStudyApp;
+use crate::app::components::world_map::WorldMapState;
+use crate::app::WorldStudyApp;
 use egui::Context;
 
 #[derive(Debug, Default)]
-pub struct CountryStudyState {
+pub struct StudyMenuState {
     world_map: WorldMapState,
 }
 
 pub fn render(ctx: &Context, app: &mut WorldStudyApp) {
     egui::CentralPanel::default().show(ctx, |ui| {
-        app.country_study_state.world_map.draw(ui);
+        app.study_menu_state.world_map.draw(ui);
     });
 }

@@ -1,4 +1,4 @@
-use crate::ui::styles::generic_size::GenericSize;
+use crate::app::styles::generic_size::GenericSize;
 use egui::Vec2;
 
 #[derive(Debug, Clone, Copy)]
