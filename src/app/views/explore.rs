@@ -62,7 +62,7 @@ impl PersistentObject for ExploreState {
 }
 
 pub fn render(ctx: &Context, app: &mut WorldStudyApp) {
-    egui::TopBottomPanel::top("top_panel").show(ctx, |ui| {
+    egui::TopBottomPanel::top("explore_top_panel").show(ctx, |ui| {
         egui::menu::bar(ui, |ui| {
             if ui.button(" 🏠 ").clicked() {
                 app.switch_view(UIView::MainMenu);

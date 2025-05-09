@@ -33,7 +33,6 @@ pub struct WorldMapStatePersist {
     scene_rect_min_y: f32,
     scene_rect_max_x: f32,
     scene_rect_max_y: f32,
-    hovered_country: Option<String>,
     selected_country: Option<String>,
 }
 
@@ -46,7 +45,6 @@ impl PersistentObject for WorldMapState {
             scene_rect_min_y: self.scene_rect.min.y,
             scene_rect_max_x: self.scene_rect.max.x,
             scene_rect_max_y: self.scene_rect.max.y,
-            hovered_country: self.hovered_country.clone(),
             selected_country: self.selected_country.clone(),
         }
     }
@@ -57,7 +55,7 @@ impl PersistentObject for WorldMapState {
         let scene_rect = Rect::from_min_max(min, max);
         Self {
             scene_rect,
-            hovered_country: state.hovered_country,
+            hovered_country: None,
             selected_country: state.selected_country,
             mouse_position: None,
         }
