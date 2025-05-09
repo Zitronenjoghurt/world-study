@@ -2,6 +2,7 @@ use crate::app::persistence::{persist_state, restore_state};
 use crate::app::views::explore::{ExploreState, ExploreStatePersist};
 use crate::app::views::main_menu::MainMenuState;
 use crate::app::views::quiz_menu::{QuizMenuState, QuizMenuStatePersist};
+use crate::app::views::quiz_run::{QuizRunState, QuizRunStatePersist};
 use crate::app::views::study_menu::StudyMenuState;
 use crate::app::views::*;
 use eframe::{App, Frame};
@@ -24,6 +25,7 @@ pub struct WorldStudyApp {
     study_menu_state: StudyMenuState,
     explore_state: ExploreState,
     quiz_menu_state: QuizMenuState,
+    quiz_run_state: QuizRunState,
 }
 
 impl WorldStudyApp {
@@ -45,6 +47,7 @@ pub struct AppState {
     last_view: UIView,
     explore_state: ExploreStatePersist,
     quiz_menu_state: QuizMenuStatePersist,
+    quiz_run_state: QuizRunStatePersist,
 }
 
 impl PersistentObject for WorldStudyApp {
@@ -55,6 +58,7 @@ impl PersistentObject for WorldStudyApp {
             last_view: self.current_view,
             explore_state: self.explore_state.save_state(),
             quiz_menu_state: self.quiz_menu_state.save_state(),
+            quiz_run_state: self.quiz_run_state.save_state(),
         }
     }
 
@@ -65,6 +69,7 @@ impl PersistentObject for WorldStudyApp {
             study_menu_state: StudyMenuState,
             explore_state: ExploreState::load_state(state.explore_state),
             quiz_menu_state: QuizMenuState::load_state(state.quiz_menu_state),
+            quiz_run_state: QuizRunState::load_state(state.quiz_run_state),
         }
     }
 }
@@ -79,6 +84,7 @@ impl App for WorldStudyApp {
             UIView::StudyMenu => study_menu::render(ctx, self),
             UIView::Explore => explore::render(ctx, self),
             UIView::QuizMenu => quiz_menu::render(ctx, self),
+            UIView::QuizRun => quiz_run::render(ctx, self),
         }
 
         #[cfg(feature = "profiling")]

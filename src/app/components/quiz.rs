@@ -1,16 +1,14 @@
-use crate::app::components::quiz::flag_name_country::{
-    FlagNameCountryQuiz, FlagNameCountryQuizState,
-};
 use crate::app::persistence::persistent_object::PersistentObject;
 use egui::Ui;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
+use types::flag_name_country::{FlagNameCountryQuiz, FlagNameCountryQuizState};
 
-mod flag_name_country;
+pub mod settings;
+pub mod types;
 
 pub trait QuizTrait: Debug + Default + PersistentObject {
     fn render(&mut self, ui: &mut Ui) -> Option<bool>;
-    fn render_settings(&mut self, ui: &mut Ui);
     fn start(&mut self);
     fn has_started(&self) -> bool;
     fn is_successful(&self) -> Option<bool>;
@@ -65,22 +63,12 @@ impl PersistentObject for Quiz {
 
 impl QuizTrait for Quiz {
     fn render(&mut self, ui: &mut Ui) -> Option<bool> {
-        if self.is_successful().is_some() {
-            return self.is_successful();
-        }
-
         if !self.has_started() {
             self.start();
         }
 
         match self {
             Self::FlagNameCountry(quiz) => quiz.render(ui),
-        }
-    }
-
-    fn render_settings(&mut self, ui: &mut Ui) {
-        match self {
-            Self::FlagNameCountry(quiz) => quiz.render_settings(ui),
         }
     }
 
