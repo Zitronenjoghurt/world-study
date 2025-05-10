@@ -1,7 +1,10 @@
 use crate::app::components::quiz::settings::flag_name_country::FlagNameCountryQuizSettings;
+use crate::app::components::quiz::stats::flag_name_country::FlagNameCountryQuizStats;
+use crate::app::components::quiz::stats::{QuizStats, QuizStatsCommon};
 use crate::app::components::quiz::QuizTrait;
 use crate::app::persistence::persistent_object::PersistentObject;
 use crate::get_data;
+use crate::utils::time::timestamp_ms;
 use eframe::emath::Vec2;
 use egui::{Align, Key, Layout, RichText, Ui};
 use rand::seq::IndexedRandom;
@@ -10,7 +13,8 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default)]
 pub struct FlagNameCountryQuiz {
     success: Option<bool>,
-    started: bool,
+    started_at: Option<u128>,
+    finished_at: Option<u128>,
     solution: Option<String>,
     answer: String,
     tries: u8,
@@ -20,7 +24,8 @@ pub struct FlagNameCountryQuiz {
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct FlagNameCountryQuizState {
     success: Option<bool>,
-    started: bool,
+    started_at: Option<u128>,
+    finished_at: Option<u128>,
     solution: Option<String>,
     answer: String,
     tries: u8,
@@ -33,7 +38,8 @@ impl PersistentObject for FlagNameCountryQuiz {
     fn save_state(&self) -> Self::PersistentState {
         FlagNameCountryQuizState {
             success: self.success,
-            started: self.started,
+            started_at: self.started_at,
+            finished_at: self.finished_at,
             solution: self.solution.clone(),
             answer: self.answer.clone(),
             tries: self.tries,
@@ -44,7 +50,8 @@ impl PersistentObject for FlagNameCountryQuiz {
     fn load_state(state: Self::PersistentState) -> Self {
         Self {
             success: state.success,
-            started: state.started,
+            started_at: state.started_at,
+            finished_at: state.finished_at,
             solution: state.solution,
             answer: state.answer,
             tries: state.tries,
@@ -71,9 +78,9 @@ impl FlagNameCountryQuiz {
 
         self.tries += 1;
         if right_answer {
-            self.success = Some(true);
+            self.finish(true);
         } else if self.tries >= self.settings.max_tries {
-            self.success = Some(false);
+            self.finish(false);
         } else {
             self.answer.clear();
         }
@@ -130,7 +137,7 @@ impl QuizTrait for FlagNameCountryQuiz {
                             Layout::left_to_right(Align::Center),
                             |ui| {
                                 if ui.button("Dunno").clicked() {
-                                    self.success = Some(false);
+                                    self.finish(false);
                                 }
                             },
                         );
@@ -152,7 +159,8 @@ impl QuizTrait for FlagNameCountryQuiz {
     }
 
     fn start(&mut self) {
-        self.started = true;
+        self.reset();
+        self.started_at = Some(timestamp_ms());
 
         let mut rng = rand::rng();
         let random_country_code = get_data()
@@ -163,8 +171,13 @@ impl QuizTrait for FlagNameCountryQuiz {
         self.solution = Some(random_country_code);
     }
 
+    fn finish(&mut self, success: bool) {
+        self.success = Some(success);
+        self.finished_at = Some(timestamp_ms());
+    }
+
     fn has_started(&self) -> bool {
-        self.started
+        self.started_at.is_some()
     }
 
     fn is_successful(&self) -> Option<bool> {
@@ -173,9 +186,20 @@ impl QuizTrait for FlagNameCountryQuiz {
 
     fn reset(&mut self) {
         self.success = None;
-        self.started = false;
+        self.started_at = None;
         self.solution = None;
         self.answer = String::new();
         self.tries = 0;
+    }
+
+    fn collect_stats(&self) -> Option<QuizStats> {
+        let common = QuizStatsCommon {
+            started_at_ms: self.started_at?,
+            finished_at_ms: self.finished_at?,
+        };
+
+        let stats = FlagNameCountryQuizStats { common };
+
+        Some(QuizStats::FlagNameCountry(stats))
     }
 }

@@ -9,6 +9,7 @@ use serde::{Deserialize, Serialize};
 #[derive(Debug, Default)]
 pub struct QuizRunState {
     quizzes: Vec<Quiz>,
+    stats_collected: bool,
     active_quiz: usize,
 }
 
@@ -29,6 +30,7 @@ impl QuizRunState {
     }
 
     pub fn restart_active_quiz(&mut self) {
+        self.stats_collected = false;
         self.get_active_quiz().start()
     }
 }
@@ -36,6 +38,7 @@ impl QuizRunState {
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct QuizRunStatePersist {
     quizzes: Vec<QuizState>,
+    stats_collected: bool,
     active_quiz: usize,
 }
 
@@ -45,6 +48,7 @@ impl PersistentObject for QuizRunState {
     fn save_state(&self) -> Self::PersistentState {
         QuizRunStatePersist {
             quizzes: self.quizzes.iter().map(|q| q.save_state()).collect(),
+            stats_collected: self.stats_collected,
             active_quiz: self.active_quiz,
         }
     }
@@ -52,6 +56,7 @@ impl PersistentObject for QuizRunState {
     fn load_state(state: Self::PersistentState) -> Self {
         Self {
             quizzes: state.quizzes.into_iter().map(Quiz::load_state).collect(),
+            stats_collected: state.stats_collected,
             active_quiz: state.active_quiz,
         }
     }
@@ -68,6 +73,13 @@ pub fn render(ctx: &Context, app: &mut WorldStudyApp) {
 
     egui::CentralPanel::default().show(ctx, |ui| {
         if app.quiz_run_state.get_active_quiz().render(ui).is_some() {
+            if !app.quiz_run_state.stats_collected {
+                if let Some(stats) = app.quiz_run_state.get_active_quiz().collect_stats() {
+                    app.log_quiz_stats(stats);
+                    app.quiz_run_state.stats_collected = true;
+                }
+            }
+
             ui.add_space(5.0);
             let next_button = ui.vertical_centered(|ui| ui.button("Next"));
             if next_button.inner.clicked() || ui.input(|input| input.key_pressed(Key::Space)) {

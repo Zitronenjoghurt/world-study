@@ -6,6 +6,7 @@ use std::sync::Arc;
 use world_study_data::WorldStudyData;
 
 mod app;
+pub mod utils;
 
 const INCLUDED_DATA: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/data.bin"));
 static DATA: Lazy<Arc<WorldStudyData>> = Lazy::new(|| {

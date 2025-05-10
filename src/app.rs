@@ -1,3 +1,4 @@
+use crate::app::components::quiz::stats::QuizStats;
 use crate::app::persistence::{persist_state, restore_state};
 use crate::app::views::explore::{ExploreState, ExploreStatePersist};
 use crate::app::views::main_menu::MainMenuState;
@@ -19,6 +20,7 @@ mod views;
 #[derive(Debug, Default)]
 pub struct WorldStudyApp {
     current_view: UIView,
+    quiz_history: Vec<QuizStats>,
 
     // View states
     main_menu_state: MainMenuState,
@@ -40,11 +42,16 @@ impl WorldStudyApp {
     pub fn switch_view(&mut self, target_view: UIView) {
         self.current_view = target_view
     }
+
+    pub fn log_quiz_stats(&mut self, stats: QuizStats) {
+        self.quiz_history.push(stats);
+    }
 }
 
 #[derive(Debug, Default, Serialize, Deserialize)]
 pub struct AppState {
     last_view: UIView,
+    quiz_history: Vec<QuizStats>,
     explore_state: ExploreStatePersist,
     quiz_menu_state: QuizMenuStatePersist,
     quiz_run_state: QuizRunStatePersist,
@@ -56,6 +63,7 @@ impl PersistentObject for WorldStudyApp {
     fn save_state(&self) -> Self::PersistentState {
         AppState {
             last_view: self.current_view,
+            quiz_history: self.quiz_history.clone(),
             explore_state: self.explore_state.save_state(),
             quiz_menu_state: self.quiz_menu_state.save_state(),
             quiz_run_state: self.quiz_run_state.save_state(),
@@ -65,6 +73,7 @@ impl PersistentObject for WorldStudyApp {
     fn load_state(state: Self::PersistentState) -> Self {
         Self {
             current_view: state.last_view,
+            quiz_history: state.quiz_history,
             main_menu_state: MainMenuState,
             study_menu_state: StudyMenuState,
             explore_state: ExploreState::load_state(state.explore_state),

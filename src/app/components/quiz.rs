@@ -1,3 +1,4 @@
+use crate::app::components::quiz::stats::QuizStats;
 use crate::app::persistence::persistent_object::PersistentObject;
 use egui::Ui;
 use serde::{Deserialize, Serialize};
@@ -5,14 +6,17 @@ use std::fmt::Debug;
 use types::flag_name_country::{FlagNameCountryQuiz, FlagNameCountryQuizState};
 
 pub mod settings;
+pub mod stats;
 pub mod types;
 
 pub trait QuizTrait: Debug + Default + PersistentObject {
     fn render(&mut self, ui: &mut Ui) -> Option<bool>;
     fn start(&mut self);
+    fn finish(&mut self, success: bool);
     fn has_started(&self) -> bool;
     fn is_successful(&self) -> Option<bool>;
     fn reset(&mut self);
+    fn collect_stats(&self) -> Option<QuizStats>;
 }
 
 #[derive(Debug)]
@@ -73,10 +77,14 @@ impl QuizTrait for Quiz {
     }
 
     fn start(&mut self) {
-        self.reset();
-
         match self {
             Self::FlagNameCountry(quiz) => quiz.start(),
+        }
+    }
+
+    fn finish(&mut self, success: bool) {
+        match self {
+            Self::FlagNameCountry(quiz) => quiz.finish(success),
         }
     }
 
@@ -95,6 +103,12 @@ impl QuizTrait for Quiz {
     fn reset(&mut self) {
         match self {
             Self::FlagNameCountry(quiz) => quiz.reset(),
+        }
+    }
+
+    fn collect_stats(&self) -> Option<QuizStats> {
+        match self {
+            Self::FlagNameCountry(quiz) => quiz.collect_stats(),
         }
     }
 }
