@@ -2,6 +2,7 @@ use crate::country::meshes::{CountryMeshes, CountryMeshesMap};
 use crate::country::{parse_countries, Country};
 use crate::generic::data_map::DataMap;
 use crate::generic::identified_polygon::IdentifiedPolygon;
+use crate::generic::position::Position;
 use egui::{Color32, Image, Pos2, Shape, Stroke, Vec2};
 use geo::{Coord, LineString, Polygon};
 use rstar::{PointDistance, RTree, AABB};
@@ -10,7 +11,7 @@ use std::collections::{HashMap, HashSet};
 use std::sync::Arc;
 
 pub mod country;
-mod generic;
+pub mod generic;
 mod traits;
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -93,6 +94,12 @@ impl WorldStudyData {
 
     pub fn get_country_meshes(&self, country_code: &str) -> Option<&CountryMeshes> {
         self.country_meshes.get(country_code)
+    }
+
+    pub fn get_country_capitals(&self, country_code: &str) -> Option<&HashMap<String, Position>> {
+        self.countries
+            .get(country_code)
+            .map(|country| &country.capitals)
     }
 
     pub fn get_regions(&self) -> &HashSet<String> {

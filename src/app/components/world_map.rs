@@ -1,6 +1,6 @@
 use crate::app::persistence::persistent_object::PersistentObject;
 use crate::get_data;
-use egui::{Color32, Pos2, Rect, Ui, Vec2};
+use egui::{Color32, Pos2, Rect, Stroke, Ui, Vec2};
 use serde::{Deserialize, Serialize};
 
 const HEIGHT: f32 = 670.0;
@@ -124,6 +124,19 @@ fn draw_country(ui: &mut Ui, country_code: &str, is_selected: bool, is_hovered: 
     if let Some(outlines) = get_data().get_country_outlines(country_code) {
         for outline in outlines {
             ui.painter().add(outline.clone());
+        }
+    }
+
+    if let Some(capitals) = get_data().get_country_capitals(country_code) {
+        for capital in capitals {
+            let (_, pos) = capital;
+            let position = Pos2::new(pos.x, pos.y);
+            ui.painter().circle(
+                position,
+                0.25,
+                Color32::from_rgb(255, 0, 0),
+                Stroke::new(0.025, Color32::from_rgb(0, 0, 0)),
+            );
         }
     }
 }

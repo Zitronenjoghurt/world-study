@@ -1,4 +1,5 @@
 use crate::generic::data_map::DataMap;
+use crate::generic::position::Position;
 use crate::traits::has_id::HasId;
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -17,10 +18,14 @@ const WORLD_SVG_PATH: &str = "data/files/world.svg";
 pub struct Country {
     pub code: String,
     pub name: String,
-    pub long_name: String,
+    pub official_name: String,
     pub region: String,
-    pub outlines: Vec<Vec<(f32, f32)>>,
     pub is_enclave: bool,
+    pub population: u32,
+    pub area: u32,
+    pub tlds: Vec<String>,
+    pub capitals: HashMap<String, Position>,
+    pub outlines: Vec<Vec<(f32, f32)>>,
     pub flag_svg: Vec<u8>,
 }
 
@@ -37,10 +42,14 @@ impl HasId for Country {
 }
 
 #[derive(Serialize, Deserialize)]
-struct JsonCountry {
+pub struct JsonCountry {
     pub name: String,
-    pub longname: String,
+    pub official_name: String,
     pub region: String,
+    pub population: u32,
+    pub area: u32,
+    pub tlds: Vec<String>,
+    pub capitals: HashMap<String, Position>,
     #[serde(default)]
     pub is_enclave: bool,
 }
@@ -61,10 +70,14 @@ pub fn parse_countries() -> DataMap<Country> {
             outlines: outlines.get(&code).cloned().unwrap_or_default(),
             code,
             name: data.name,
-            long_name: data.longname,
+            official_name: data.official_name,
             region: data.region,
             is_enclave: data.is_enclave,
+            population: data.population,
+            area: data.area,
+            tlds: data.tlds,
             flag_svg,
+            capitals: data.capitals,
         };
 
         countries.add(country);

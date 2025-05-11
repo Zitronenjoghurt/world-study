@@ -36,8 +36,8 @@ pub fn render_details_window(ctx: &Context, app: &mut WorldStudyApp) {
                         ui.label(&country.code);
                         ui.end_row();
 
-                        ui.strong("Long Name");
-                        ui.label(&country.long_name);
+                        ui.strong("Official Name");
+                        ui.label(&country.official_name);
                         ui.end_row();
                     })
             });
