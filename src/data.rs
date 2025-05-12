@@ -5,6 +5,7 @@ use crate::data::polygon_tree::build_country_polygon_tree;
 use eframe::emath::Vec2;
 use eframe::epaint::Shape;
 use egui::Image;
+use geo::SimplifyVw;
 use rstar::{PointDistance, RTree, AABB};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -27,7 +28,16 @@ pub struct WorldStudyData {
 
 impl WorldStudyData {
     pub fn load() -> Self {
-        let world_data = world_data::load();
+        let mut world_data = world_data::load();
+        world_data.countries.values_mut().for_each(|country| {
+            let simplified_polygons = country
+                .polygons
+                .iter()
+                .map(|poly| poly.simplify_vw(&0.0025))
+                .collect();
+            country.polygons = simplified_polygons;
+        });
+
         let countries: HashMap<String, Arc<Country>> = world_data
             .countries
             .iter()
