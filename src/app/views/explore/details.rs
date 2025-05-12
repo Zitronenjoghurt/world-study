@@ -9,7 +9,7 @@ pub fn render_details_window(ctx: &Context, app: &mut WorldStudyApp) {
     if let Some(selected_country) = &app.explore_state.world_map.selected_country {
         let country = &get_data().get_country(selected_country).unwrap().clone();
 
-        egui::Window::new(&country.name)
+        egui::Window::new(&country.common_name)
             .open(&mut app.explore_state.details_window_enabled)
             .id(egui::Id::new("explore_details_window"))
             .show(ctx, |ui| {
@@ -33,7 +33,7 @@ pub fn render_details_window(ctx: &Context, app: &mut WorldStudyApp) {
                         }
 
                         ui.strong("Code");
-                        ui.label(&country.code);
+                        ui.label(&country.iso_a2);
                         ui.end_row();
 
                         ui.strong("Official Name");

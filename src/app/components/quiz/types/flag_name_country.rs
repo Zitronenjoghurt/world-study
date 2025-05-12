@@ -74,7 +74,7 @@ impl FlagNameCountryQuiz {
 
     fn submit(&mut self, country_code: &str) {
         let country = get_data().get_country(country_code).cloned().unwrap();
-        let right_answer = self.answer.to_lowercase() == country.name.to_lowercase();
+        let right_answer = self.answer.to_lowercase() == country.common_name.to_lowercase();
 
         self.tries += 1;
         if right_answer {
@@ -150,7 +150,7 @@ impl QuizTrait for FlagNameCountryQuiz {
                 Some(false) => {
                     let country = get_data().get_country(&country_code).unwrap().clone();
                     ui.add_space(20.0);
-                    ui.label(format!("Solution: {}", country.name));
+                    ui.label(format!("Solution: {}", country.common_name));
                 }
             }
         });

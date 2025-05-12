@@ -1,6 +1,6 @@
 use crate::app::persistence::persistent_object::PersistentObject;
 use crate::get_data;
-use egui::{Color32, Pos2, Rect, Stroke, Ui, Vec2};
+use egui::{Color32, Pos2, Rect, Ui};
 use serde::{Deserialize, Serialize};
 
 const HEIGHT: f32 = 670.0;
@@ -19,7 +19,7 @@ pub struct WorldMapState {
 impl Default for WorldMapState {
     fn default() -> Self {
         Self {
-            scene_rect: Rect::from_min_size(Pos2::ZERO, Vec2::new(WIDTH, HEIGHT)),
+            scene_rect: Rect::from_two_pos(Pos2::new(-180.0, -180.0), Pos2::new(180.0, 180.0)),
             hovered_country: None,
             selected_country: None,
             mouse_position: None,
@@ -67,7 +67,7 @@ impl WorldMapState {
         let scene = egui::Scene::new().zoom_range(0.2..=1000.0);
 
         scene.show(ui, &mut self.scene_rect, |ui| {
-            let hover_rect = Rect::from_min_size(Pos2::ZERO, Vec2::new(WIDTH, HEIGHT));
+            let hover_rect = Rect::from_two_pos(Pos2::new(-180.0, -90.0), Pos2::new(180.0, 60.0));
             ui.painter()
                 .rect_filled(hover_rect, CORNER_RADIUS, BACKGROUND_COLOR);
 
@@ -76,7 +76,7 @@ impl WorldMapState {
             if hover_rect_response.hovered() {
                 if let Some(mouse_pos) = hover_rect_response.hover_pos() {
                     self.hovered_country =
-                        get_data().get_country_code_at_point(mouse_pos.x, mouse_pos.y);
+                        get_data().get_country_code_at_point(mouse_pos.x, -mouse_pos.y);
                     self.mouse_position = Some(mouse_pos);
                 }
             }
@@ -127,16 +127,16 @@ fn draw_country(ui: &mut Ui, country_code: &str, is_selected: bool, is_hovered: 
         }
     }
 
-    if let Some(capitals) = get_data().get_country_capitals(country_code) {
-        for capital in capitals {
-            let (_, pos) = capital;
-            let position = Pos2::new(pos.x, pos.y);
-            ui.painter().circle(
-                position,
-                0.25,
-                Color32::from_rgb(255, 0, 0),
-                Stroke::new(0.025, Color32::from_rgb(0, 0, 0)),
-            );
-        }
-    }
+    //if let Some(capitals) = get_data().get_country_capitals(country_code) {
+    //    for capital in capitals {
+    //        let (_, pos) = capital;
+    //        let position = Pos2::new(pos.x, pos.y);
+    //        ui.painter().circle(
+    //            position,
+    //            0.25,
+    //            Color32::from_rgb(255, 0, 0),
+    //            Stroke::new(0.025, Color32::from_rgb(0, 0, 0)),
+    //        );
+    //    }
+    //}
 }

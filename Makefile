@@ -1,7 +1,4 @@
-.PHONY: trace gen-country
+.PHONY: trace
 
 trace:
 	cargo run --release --features tracy
-
-gen-country:
-	cd tools && cargo run --bin generate-country-data

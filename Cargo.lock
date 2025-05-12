@@ -1330,6 +1330,7 @@ dependencies = [
  "num-traits",
  "robust",
  "rstar",
+ "serde",
  "spade",
 ]
 
@@ -3303,12 +3304,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "svg"
-version = "0.18.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "94afda9cd163c04f6bee8b4bf2501c91548deae308373c436f36aeff3cf3c4a3"
-
-[[package]]
 name = "svgtypes"
 version = "0.13.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4432,36 +4427,46 @@ dependencies = [
 ]
 
 [[package]]
+name = "world-data"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ee954d41ff516bf7170f59d3942761b1216c680bb4513ef3a82503d58142df86"
+dependencies = [
+ "bincode",
+ "flate2",
+ "world-data-types",
+]
+
+[[package]]
+name = "world-data-types"
+version = "0.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7d9740d2ce54bf04e4c76fb3cfa262c2696ea624d1ec651cde17f7b1af244a28"
+dependencies = [
+ "geo",
+ "serde",
+]
+
+[[package]]
 name = "world-study"
 version = "0.1.0"
 dependencies = [
- "bincode",
  "directories",
+ "earcutr",
  "eframe",
  "egui",
  "egui_extras",
- "flate2",
+ "geo",
  "log",
  "once_cell",
  "profiling",
  "rand 0.9.1",
- "serde",
- "serde_json",
- "tracy-client 0.18.0",
- "world-study-data",
-]
-
-[[package]]
-name = "world-study-data"
-version = "0.1.0"
-dependencies = [
- "earcutr",
- "egui",
- "geo",
  "rstar",
  "serde",
  "serde_json",
- "svg",
+ "tracy-client 0.18.0",
+ "world-data",
+ "world-data-types",
 ]
 
 [[package]]

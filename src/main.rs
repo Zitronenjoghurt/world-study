@@ -1,23 +1,13 @@
 use crate::app::WorldStudyApp;
-use flate2::read::ZlibDecoder;
+use crate::data::WorldStudyData;
 use once_cell::sync::Lazy;
-use std::io::Read;
 use std::sync::Arc;
-use world_study_data::WorldStudyData;
 
 mod app;
+mod data;
 pub mod utils;
 
-const INCLUDED_DATA: &[u8] = include_bytes!(concat!(env!("OUT_DIR"), "/data.bin"));
-static DATA: Lazy<Arc<WorldStudyData>> = Lazy::new(|| {
-    let mut decompressor = ZlibDecoder::new(INCLUDED_DATA);
-    let mut decompressed_data = Vec::new();
-    decompressor.read_to_end(&mut decompressed_data).unwrap();
-
-    let mut data: WorldStudyData = bincode::deserialize(&decompressed_data).unwrap();
-    data.initialize();
-    Arc::new(data)
-});
+static DATA: Lazy<Arc<WorldStudyData>> = Lazy::new(|| Arc::new(WorldStudyData::load()));
 
 pub fn get_data() -> Arc<WorldStudyData> {
     DATA.clone()

@@ -4,25 +4,22 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bincode = "1.3.3"
+earcutr = "0.4.3"
 eframe = "0.31.1"
 egui = "0.31.1"
 egui_extras = { version = "0.31.1", features = ["svg"] }
-flate2 = "1.1.1"
+geo = "0.30.0"
+rstar = "0.12.2"
 once_cell = "1.21.3"
 profiling = { version = "1.0.16", optional = true }
 tracy-client = { version = "0.18.0", optional = true }
-world-study-data = { path = "data" }
 serde = { version = "1.0.219", features = ["derive"] }
 directories = "6.0.0"
 serde_json = "1.0.140"
 log = "0.4.27"
 rand = "0.9.1"
-
-[build-dependencies]
-bincode = "1.3.3"
-flate2 = "1.1.1"
-world-study-data = { path = "data" }
+world-data = "0.3.0"
+world-data-types = "0.3.0"
 
 [features]
 tracy = ["profiling/profile-with-tracy", "tracy-client/enable"]

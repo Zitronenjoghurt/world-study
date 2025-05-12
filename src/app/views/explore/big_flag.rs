@@ -15,7 +15,7 @@ pub fn render_big_flag_window(ctx: &Context, app: &mut WorldStudyApp) {
         return;
     };
 
-    egui::Window::new(format!("Flag of {}", country.name))
+    egui::Window::new(format!("Flag of {}", country.common_name))
         .id(Id::new("explore_big_flag_window"))
         .open(&mut app.explore_state.big_flag_window_enabled)
         .resizable(true)
