@@ -5,7 +5,7 @@ use crate::data::polygon_tree::build_country_polygon_tree;
 use eframe::emath::Vec2;
 use eframe::epaint::Shape;
 use egui::Image;
-use geo::SimplifyVw;
+use geo::{Scale, SimplifyVw};
 use rstar::{PointDistance, RTree, AABB};
 use std::collections::HashMap;
 use std::sync::Arc;
@@ -17,6 +17,13 @@ mod outlines;
 mod polygon_tree;
 
 const EXCLUDED_COUNTRY_CODES: &[&str] = &["AQ"];
+const SCALED_COUNTRIES: &[(&str, f32)] = &[
+    ("VA", 115.0),
+    ("SM", 2.0),
+    ("MC", 3.0),
+    ("TV", 5.0),
+    ("NR", 2.0),
+];
 
 pub struct WorldStudyData {
     countries: HashMap<String, Arc<Country>>,
@@ -28,12 +35,21 @@ pub struct WorldStudyData {
 
 impl WorldStudyData {
     pub fn load() -> Self {
+        let scaled_countries: HashMap<&str, f32> = SCALED_COUNTRIES.iter().cloned().collect();
+
         let mut world_data = world_data::load();
         world_data.countries.values_mut().for_each(|country| {
             let simplified_polygons = country
                 .polygons
                 .iter()
-                .map(|poly| poly.simplify_vw(&0.0025))
+                .map(|poly| {
+                    let scaling_factor = scaled_countries
+                        .get(country.iso_a2.as_str())
+                        .copied()
+                        .unwrap_or(1.0);
+                    let scaled_poly = poly.scale(scaling_factor);
+                    scaled_poly.simplify_vw(&0.0025)
+                })
                 .collect();
             country.polygons = simplified_polygons;
         });
@@ -50,7 +66,14 @@ impl WorldStudyData {
                 }
             })
             .collect();
-        let country_codes = countries.keys().cloned().collect();
+
+        let mut countries_sorted: Vec<_> = countries.values().cloned().collect();
+        countries_sorted.sort_by_key(|country| country.is_enclave);
+        let country_codes = countries_sorted
+            .iter()
+            .map(|country| country.iso_a2.clone())
+            .collect();
+
         let country_meshes = CountryMeshesMap::build(&countries);
         let country_outlines = build_country_outlines(&countries);
         let country_polygon_tree = build_country_polygon_tree(&countries);
