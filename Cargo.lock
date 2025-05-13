@@ -4428,9 +4428,9 @@ dependencies = [
 
 [[package]]
 name = "world-data"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cb659c88354bfb9601ca012005520b07e3784affd606f3868c735f7c2da8f339"
+checksum = "30193eee14be29bb671d3b57e419d8206e5d32e3071d3c7f2b94abc9a62121bc"
 dependencies = [
  "bincode",
  "flate2",

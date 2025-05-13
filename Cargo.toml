@@ -18,7 +18,7 @@ directories = "6.0.0"
 serde_json = "1.0.140"
 log = "0.4.27"
 rand = "0.9.1"
-world-data = "0.4.0"
+world-data = "0.4.1"
 
 [features]
 tracy = ["profiling/profile-with-tracy", "tracy-client/enable"]

@@ -3,6 +3,8 @@ use crate::data::identified_polygon::IdentifiedPolygonType;
 use crate::get_data;
 use egui::{Color32, Pos2, Rect, Stroke, Ui};
 use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use world_data::world_data_types::data::capital::Capital;
 
 const HEIGHT: f32 = 670.0;
 const WIDTH: f32 = 1010.0;
@@ -133,25 +135,19 @@ impl WorldMapState {
             for country_code in get_data().get_country_codes() {
                 let is_selected = Some(country_code.to_owned()) == self.selected_country;
                 let is_hovered = Some(country_code.to_owned()) == self.hovered_country;
-                draw_country(
-                    ui,
-                    country_code,
-                    is_selected,
-                    is_hovered,
-                    &self.hovered_capital,
-                );
+                draw_country(ui, country_code, is_selected, is_hovered);
+            }
+
+            for (name, capital) in get_data().get_capitals() {
+                let is_selected = Some(name.to_owned()) == self.selected_capital;
+                let is_hovered = Some(name.to_owned()) == self.hovered_capital;
+                draw_capital(ui, capital, is_selected, is_hovered);
             }
         });
     }
 }
 
-fn draw_country(
-    ui: &mut Ui,
-    country_code: &str,
-    is_selected: bool,
-    is_hovered: bool,
-    hovered_capital: &Option<String>,
-) {
+fn draw_country(ui: &mut Ui, country_code: &str, is_selected: bool, is_hovered: bool) {
     #[cfg(feature = "profiling")]
     profiling::scope!("draw_country");
 
@@ -174,22 +170,24 @@ fn draw_country(
             ui.painter().add(outline.clone());
         }
     }
+}
 
-    for capital in get_data().get_country_capitals(country_code) {
-        let coords = capital.coordinates;
-        let position = Pos2::new(coords.x, -coords.y);
+fn draw_capital(ui: &mut Ui, capital: &Arc<Capital>, is_selected: bool, is_hovered: bool) {
+    let coords = capital.coordinates;
+    let position = Pos2::new(coords.x, -coords.y);
 
-        let color = if Some(capital.name.to_uppercase()) == *hovered_capital {
-            Color32::from_rgb(0, 255, 0)
-        } else {
-            Color32::from_rgb(255, 0, 0)
-        };
+    let color = if is_selected {
+        Color32::from_rgb(0, 0, 255)
+    } else if is_hovered {
+        Color32::from_rgb(0, 255, 0)
+    } else {
+        Color32::from_rgb(255, 0, 0)
+    };
 
-        ui.painter().circle(
-            position,
-            0.025,
-            color,
-            Stroke::new(0.01, Color32::from_rgb(0, 0, 0)),
-        );
-    }
+    ui.painter().circle(
+        position,
+        0.025,
+        color,
+        Stroke::new(0.01, Color32::from_rgb(0, 0, 0)),
+    );
 }

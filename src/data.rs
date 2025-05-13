@@ -18,6 +18,7 @@ mod outlines;
 mod polygon_tree;
 
 const EXCLUDED_COUNTRY_CODES: &[&str] = &["AQ"];
+const EXCLUDED_CAPITAL_NAMES: &[&str] = &["VATICAN CITY", "MONACO"];
 const SCALED_COUNTRIES: &[(&str, f32)] = &[
     ("VA", 115.0),
     ("SM", 2.0),
@@ -79,12 +80,19 @@ impl WorldStudyData {
         let country_meshes = CountryMeshesMap::build(&countries);
         let country_outlines = build_country_outlines(&countries);
 
-        let capitals = world_data
+        let capitals: HashMap<String, Arc<Capital>> = world_data
             .capitals
             .iter()
             .map(|(name, capital)| (name.to_uppercase(), Arc::new(capital.clone())))
+            .filter_map(|(name, capital)| {
+                if EXCLUDED_CAPITAL_NAMES.contains(&name.as_str()) {
+                    None
+                } else {
+                    Some((name, capital))
+                }
+            })
             .collect();
-        let capital_names = world_data.capitals.keys().cloned().collect();
+        let capital_names = capitals.keys().cloned().collect();
 
         let polygon_tree = build_polygon_tree(&countries, &capitals);
 
@@ -105,6 +113,10 @@ impl WorldStudyData {
 
     pub fn get_capital(&self, capital_name: &str) -> Option<&Arc<Capital>> {
         self.capitals.get(&capital_name.to_uppercase())
+    }
+
+    pub fn get_capitals(&self) -> &HashMap<String, Arc<Capital>> {
+        &self.capitals
     }
 
     pub fn get_country_capitals(&self, country_code: &str) -> Vec<&Arc<Capital>> {
