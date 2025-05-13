@@ -2,7 +2,7 @@ use eframe::emath::Pos2;
 use eframe::epaint::{Color32, Shape, Stroke};
 use std::collections::HashMap;
 use std::sync::Arc;
-use world_data_types::data::country::Country;
+use world_data::world_data_types::data::country::Country;
 
 pub fn build_country_outlines(
     countries: &HashMap<String, Arc<Country>>,

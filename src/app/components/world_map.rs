@@ -1,6 +1,7 @@
 use crate::app::persistence::persistent_object::PersistentObject;
+use crate::data::identified_polygon::IdentifiedPolygonType;
 use crate::get_data;
-use egui::{Color32, Pos2, Rect, Ui};
+use egui::{Color32, Pos2, Rect, Stroke, Ui};
 use serde::{Deserialize, Serialize};
 
 const HEIGHT: f32 = 670.0;
@@ -12,7 +13,9 @@ const CORNER_RADIUS: f32 = 10.0;
 pub struct WorldMapState {
     scene_rect: Rect,
     pub hovered_country: Option<String>,
+    pub hovered_capital: Option<String>,
     pub selected_country: Option<String>,
+    pub selected_capital: Option<String>,
     pub mouse_position: Option<Pos2>,
 }
 
@@ -21,7 +24,9 @@ impl Default for WorldMapState {
         Self {
             scene_rect: Rect::from_two_pos(Pos2::new(-180.0, -180.0), Pos2::new(180.0, 180.0)),
             hovered_country: None,
+            hovered_capital: None,
             selected_country: None,
+            selected_capital: None,
             mouse_position: None,
         }
     }
@@ -34,6 +39,7 @@ pub struct WorldMapStatePersist {
     scene_rect_max_x: f32,
     scene_rect_max_y: f32,
     selected_country: Option<String>,
+    selected_capital: Option<String>,
 }
 
 impl PersistentObject for WorldMapState {
@@ -46,6 +52,7 @@ impl PersistentObject for WorldMapState {
             scene_rect_max_x: self.scene_rect.max.x,
             scene_rect_max_y: self.scene_rect.max.y,
             selected_country: self.selected_country.clone(),
+            selected_capital: self.selected_capital.clone(),
         }
     }
 
@@ -56,7 +63,9 @@ impl PersistentObject for WorldMapState {
         Self {
             scene_rect,
             hovered_country: None,
+            hovered_capital: None,
             selected_country: state.selected_country,
+            selected_capital: state.selected_capital,
             mouse_position: None,
         }
     }
@@ -75,9 +84,25 @@ impl WorldMapState {
                 ui.interact(hover_rect, ui.id().with("map_area"), egui::Sense::click());
             if hover_rect_response.hovered() {
                 if let Some(mouse_pos) = hover_rect_response.hover_pos() {
-                    self.hovered_country =
-                        get_data().get_country_code_at_point(mouse_pos.x, -mouse_pos.y);
                     self.mouse_position = Some(mouse_pos);
+                    if let Some(polygon) =
+                        get_data().get_polygon_id_at_point(mouse_pos.x, -mouse_pos.y)
+                    {
+                        let id = polygon.id();
+                        match polygon.polygon_type() {
+                            IdentifiedPolygonType::Country => {
+                                self.hovered_capital = None;
+                                self.hovered_country = Some(id.to_owned());
+                            }
+                            IdentifiedPolygonType::Capital => {
+                                self.hovered_country = None;
+                                self.hovered_capital = Some(id.to_owned());
+                            }
+                        }
+                    } else {
+                        self.hovered_country = None;
+                        self.hovered_capital = None;
+                    }
                 }
             }
 
@@ -92,18 +117,41 @@ impl WorldMapState {
                 } else {
                     self.selected_country = None;
                 }
+
+                if let Some(hovered_capital) = &self.hovered_capital {
+                    self.selected_capital =
+                        if self.selected_capital.as_ref() == Some(hovered_capital) {
+                            None
+                        } else {
+                            Some(hovered_capital.to_owned())
+                        };
+                } else {
+                    self.selected_capital = None;
+                }
             }
 
             for country_code in get_data().get_country_codes() {
                 let is_selected = Some(country_code.to_owned()) == self.selected_country;
                 let is_hovered = Some(country_code.to_owned()) == self.hovered_country;
-                draw_country(ui, country_code, is_selected, is_hovered);
+                draw_country(
+                    ui,
+                    country_code,
+                    is_selected,
+                    is_hovered,
+                    &self.hovered_capital,
+                );
             }
         });
     }
 }
 
-fn draw_country(ui: &mut Ui, country_code: &str, is_selected: bool, is_hovered: bool) {
+fn draw_country(
+    ui: &mut Ui,
+    country_code: &str,
+    is_selected: bool,
+    is_hovered: bool,
+    hovered_capital: &Option<String>,
+) {
     #[cfg(feature = "profiling")]
     profiling::scope!("draw_country");
 
@@ -127,16 +175,21 @@ fn draw_country(ui: &mut Ui, country_code: &str, is_selected: bool, is_hovered: 
         }
     }
 
-    //if let Some(capitals) = get_data().get_country_capitals(country_code) {
-    //    for capital in capitals {
-    //        let (_, pos) = capital;
-    //        let position = Pos2::new(pos.x, pos.y);
-    //        ui.painter().circle(
-    //            position,
-    //            0.25,
-    //            Color32::from_rgb(255, 0, 0),
-    //            Stroke::new(0.025, Color32::from_rgb(0, 0, 0)),
-    //        );
-    //    }
-    //}
+    for capital in get_data().get_country_capitals(country_code) {
+        let coords = capital.coordinates;
+        let position = Pos2::new(coords.x, -coords.y);
+
+        let color = if Some(capital.name.to_uppercase()) == *hovered_capital {
+            Color32::from_rgb(0, 255, 0)
+        } else {
+            Color32::from_rgb(255, 0, 0)
+        };
+
+        ui.painter().circle(
+            position,
+            0.025,
+            color,
+            Stroke::new(0.01, Color32::from_rgb(0, 0, 0)),
+        );
+    }
 }

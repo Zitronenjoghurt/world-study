@@ -1,19 +1,32 @@
 use geo::{BoundingRect, Contains, EuclideanDistance, Point, Polygon};
 use rstar::{PointDistance, RTreeObject, AABB};
 
+#[derive(Debug, Copy, Clone, PartialEq, Eq)]
+pub enum IdentifiedPolygonType {
+    Country,
+    Capital,
+}
+
 #[derive(Debug)]
 pub struct IdentifiedPolygon {
     id: String,
     priority: bool,
     polygon: Polygon<f32>,
+    polygon_type: IdentifiedPolygonType,
 }
 
 impl IdentifiedPolygon {
-    pub fn new(id: String, polygon: Polygon<f32>, priority: bool) -> Self {
+    pub fn new(
+        id: String,
+        polygon: Polygon<f32>,
+        priority: bool,
+        polygon_type: IdentifiedPolygonType,
+    ) -> Self {
         Self {
             id,
             priority,
             polygon,
+            polygon_type,
         }
     }
 
@@ -23,6 +36,10 @@ impl IdentifiedPolygon {
 
     pub fn priority(&self) -> bool {
         self.priority
+    }
+
+    pub fn polygon_type(&self) -> IdentifiedPolygonType {
+        self.polygon_type
     }
 }
 

@@ -13,13 +13,30 @@ pub fn render_debug_window(ctx: &Context, app: &mut WorldStudyApp) {
             if let Some(hovered) = &app.explore_state.world_map.hovered_country {
                 ui.label(format!("hovered: {hovered}"));
             } else {
-                ui.label("hovered: None");
+                ui.label("hovered country: None");
             }
 
             if let Some(selected) = &app.explore_state.world_map.selected_country {
                 ui.label(format!("selected: {selected}"));
             } else {
-                ui.label("selected: None");
+                ui.label("selected country: None");
             }
+
+            if let Some(hovered) = &app.explore_state.world_map.hovered_capital {
+                ui.label(format!("hovered: {hovered}"));
+            } else {
+                ui.label("hovered capital: None");
+            }
+
+            if let Some(selected) = &app.explore_state.world_map.selected_capital {
+                ui.label(format!("selected: {selected}"));
+            } else {
+                ui.label("selected capital: None");
+            }
+
+            ui.label(format!(
+                "update: {}ms",
+                app.update_time.as_micros() as f64 / 1000.0
+            ))
         });
 }

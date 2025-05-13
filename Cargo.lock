@@ -4428,9 +4428,9 @@ dependencies = [
 
 [[package]]
 name = "world-data"
-version = "0.3.1"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "9a5ecfb6bb4b1fed3154bea54334431d7bc9ae4597ac013a9fb0f23367664dd8"
+checksum = "cb659c88354bfb9601ca012005520b07e3784affd606f3868c735f7c2da8f339"
 dependencies = [
  "bincode",
  "flate2",
@@ -4439,9 +4439,9 @@ dependencies = [
 
 [[package]]
 name = "world-data-types"
-version = "0.3.0"
+version = "0.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7d9740d2ce54bf04e4c76fb3cfa262c2696ea624d1ec651cde17f7b1af244a28"
+checksum = "e86da373b63ea721ccb86f9ff4caf4430902e990bce6446dad8a0a523a91ee88"
 dependencies = [
  "geo",
  "serde",
@@ -4466,7 +4466,6 @@ dependencies = [
  "serde_json",
  "tracy-client 0.18.0",
  "world-data",
- "world-data-types",
 ]
 
 [[package]]

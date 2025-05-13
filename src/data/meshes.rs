@@ -2,7 +2,7 @@ use egui::{Color32, Pos2, Shape};
 use geo::CoordsIter;
 use std::collections::HashMap;
 use std::sync::Arc;
-use world_data_types::data::country::Country;
+use world_data::world_data_types::data::country::Country;
 
 #[derive(Debug, Default)]
 pub struct CountryMeshesMap(HashMap<String, CountryMeshes>);

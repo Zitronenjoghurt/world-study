@@ -10,6 +10,7 @@ use eframe::{App, Frame};
 use egui::Context;
 use persistence::persistent_object::PersistentObject;
 use serde::{Deserialize, Serialize};
+use std::time::{Duration, Instant};
 use views::UIView;
 
 mod components;
@@ -28,6 +29,9 @@ pub struct WorldStudyApp {
     explore_state: ExploreState,
     quiz_menu_state: QuizMenuState,
     quiz_run_state: QuizRunState,
+
+    // Diagnostics
+    update_time: Duration,
 }
 
 impl WorldStudyApp {
@@ -79,6 +83,7 @@ impl PersistentObject for WorldStudyApp {
             explore_state: ExploreState::load_state(state.explore_state),
             quiz_menu_state: QuizMenuState::load_state(state.quiz_menu_state),
             quiz_run_state: QuizRunState::load_state(state.quiz_run_state),
+            update_time: Duration::from_secs(0),
         }
     }
 }
@@ -88,6 +93,8 @@ impl App for WorldStudyApp {
         #[cfg(feature = "profiling")]
         profiling::scope!("frame");
 
+        let before_update = Instant::now();
+
         match self.current_view {
             UIView::MainMenu => main_menu::render(ctx, self),
             UIView::StudyMenu => study_menu::render(ctx, self),
@@ -95,6 +102,8 @@ impl App for WorldStudyApp {
             UIView::QuizMenu => quiz_menu::render(ctx, self),
             UIView::QuizRun => quiz_run::render(ctx, self),
         }
+
+        self.update_time = before_update.elapsed();
 
         #[cfg(feature = "profiling")]
         profiling::finish_frame!();
